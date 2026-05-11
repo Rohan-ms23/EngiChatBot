@@ -261,17 +261,7 @@ body {
 
 /* Input */
 .input-container { padding: 1.5rem 2.5rem; background: linear-gradient(to top, var(--bg-primary) 70%, transparent); }
-.input-wrapper {
-    display: flex;
-    align-items: flex-end;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 0.5rem 0.75rem;
-    max-width: 900px;
-    margin: 0 auto;
-    transition: all 0.3s;
-}
+
 .input-wrapper:focus-within { border-color: var(--accent-color); box-shadow: var(--shadow-glow); }
 #user-input { flex-grow: 1; background: transparent; border: none; color: var(--text-primary); padding: 0.75rem 1rem; resize: none; outline: none; }
 #send-btn { background: var(--user-msg-bg); color: white; border: none; width: 44px; height: 44px; border-radius: 14px; cursor: pointer; margin-bottom: 2px; }
@@ -301,7 +291,6 @@ body {
     .message { max-width: 95%; }
     .chat-box { padding: 1.5rem; }
 }
-
 #mic-btn {
     background-color: transparent;
     color: var(--text-secondary);
@@ -335,4 +324,17 @@ body {
     0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
     70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
     100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: flex-end;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.5rem 0.75rem;
+    max-width: 900px;
+    width: 100%; /* This is the magic line that makes it wide! */
+    margin: 0 auto;
+    transition: all 0.3s;
 }
