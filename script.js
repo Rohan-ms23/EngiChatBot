@@ -244,3 +244,62 @@ document.addEventListener('DOMContentLoaded', () => {
         return data.candidates[0].content.parts[0].text;
     }
 });
+
+    // --- Voice Input (Web Speech API) ---
+    // Check if the browser supports Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false; // Stops automatically when you pause speaking
+        recognition.interimResults = true; // Shows words as you speak them
+        
+        let isRecording = false;
+
+        recognition.onstart = () => {
+            isRecording = true;
+            micBtn.classList.add('recording');
+            userInput.placeholder = "Listening...";
+        };
+
+        recognition.onresult = (event) => {
+            let currentTranscript = '';
+            // Piece together the words
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                currentTranscript += event.results[i][0].transcript;
+            }
+            userInput.value = currentTranscript;
+            
+            // Auto-resize the text box as words fill in
+            userInput.style.height = 'auto';
+            userInput.style.height = (userInput.scrollHeight < 150 ? userInput.scrollHeight : 150) + 'px';
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Microphone error:", event.error);
+            stopRecording();
+        };
+
+        recognition.onend = () => {
+            stopRecording();
+        };
+
+        function stopRecording() {
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            userInput.placeholder = "Ask an engineering question...";
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                userInput.value = ''; // Clear the box before recording
+                recognition.start();
+            }
+        });
+    } else {
+        // If the browser (like old versions or some mobile browsers) doesn't support it, hide the button
+        micBtn.style.display = 'none';
+        console.warn("Speech Recognition API not supported in this browser.");
+    }
