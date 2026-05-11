@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
+    // 1. DOM Elements
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
+    const micBtn = document.getElementById('mic-btn'); // New Mic Button
     const welcomeScreen = document.getElementById('welcome-screen');
     const themeToggle = document.getElementById('theme-toggle');
     const settingsBtn = document.getElementById('settings-btn');
@@ -17,15 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const promptBtns = document.querySelectorAll('.prompt-btn');
     const chatHistoryList = document.getElementById('chat-history');
 
-    // State Variables
+    // 2. State Variables
     let apiKey = localStorage.getItem('gemini_api_key') || '';
     let isGenerating = false;
-    
-    // Chat History Database System
     let savedChats = JSON.parse(localStorage.getItem('engimind_chats')) || [];
     let currentChatId = null;
 
-    // Initialize Markdown syntax highlighting
+    // 3. Initialize Markdown
     marked.setOptions({
         highlight: function(code, lang) {
             const language = hljs.getLanguage(lang) ? lang : 'plaintext';
@@ -34,10 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
         langPrefix: 'hljs language-'
     });
 
-    // Initial Setup
     renderHistoryList();
 
-    // Theme Toggle
+    // 4. Basic UI Toggles
     themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -45,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fa-solid fa-sun"></i> Theme' : '<i class="fa-solid fa-moon"></i> Theme';
     });
 
-    // UI Toggles
     menuBtn.addEventListener('click', () => sidebar.classList.add('active'));
     closeSidebarBtn.addEventListener('click', () => sidebar.classList.remove('active'));
 
@@ -71,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
         this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
     });
 
-    // Handle Clicks & Enters
     promptBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             userInput.value = btn.getAttribute('data-prompt');
@@ -89,14 +85,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     newChatBtn.addEventListener('click', startNewChat);
 
-    // --- Core Chat Functions ---
+    // 5. Voice Recognition (Microphone) Logic
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition && micBtn) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        let isRecording = false;
 
+        recognition.onstart = () => {
+            isRecording = true;
+            micBtn.classList.add('recording');
+            userInput.placeholder = "Listening...";
+        };
+
+        recognition.onresult = (event) => {
+            let currentTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                currentTranscript += event.results[i][0].transcript;
+            }
+            userInput.value = currentTranscript;
+            userInput.style.height = 'auto';
+            userInput.style.height = (userInput.scrollHeight < 150 ? userInput.scrollHeight : 150) + 'px';
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Microphone error:", event.error);
+            stopRecording();
+        };
+
+        recognition.onend = () => stopRecording();
+
+        function stopRecording() {
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            userInput.placeholder = "Ask an engineering question...";
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                userInput.value = ''; 
+                recognition.start();
+            }
+        });
+    } else if (micBtn) {
+        micBtn.style.display = 'none';
+        console.warn("Speech Recognition API not supported in this browser.");
+    }
+
+    // 6. Core Chat Functions
     function startNewChat() {
         currentChatId = null;
         chatBox.innerHTML = '';
         chatBox.appendChild(welcomeScreen);
         welcomeScreen.style.display = 'flex';
-        renderHistoryList(); // clear active state
+        renderHistoryList(); 
         if(window.innerWidth <= 768) sidebar.classList.remove('active');
     }
 
@@ -105,16 +150,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const chatData = savedChats.find(c => c.id === id);
         if(!chatData) return;
 
-        // Clear screen and hide welcome
         chatBox.innerHTML = '';
         welcomeScreen.style.display = 'none';
 
-        // Re-render past messages
         chatData.messages.forEach(msg => {
-            appendMessage(msg.role, msg.content, false); // false = don't save to storage again
+            appendMessage(msg.role, msg.content, false); 
         });
 
-        renderHistoryList(); // Update active highlight
+        renderHistoryList(); 
         if(window.innerWidth <= 768) sidebar.classList.remove('active');
     }
 
@@ -128,8 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         welcomeScreen.style.display = 'none';
-        
-        // Print user message to screen and save it
         appendMessage('user', text, true);
         
         userInput.value = '';
@@ -141,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetchGeminiAPI(text);
             typingIndicator.remove();
-            // Print AI message to screen and save it
             appendMessage('ai', response, true);
         } catch (error) {
             typingIndicator.remove();
@@ -176,23 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (shouldSave) saveToDatabase(sender, text);
     }
 
-    // --- Database / Saving Logic ---
-
+    // 7. Database Logic (Local Storage)
     function saveToDatabase(role, content) {
-        // If it's the very first message, create a new chat container
         if (!currentChatId) {
             currentChatId = Date.now().toString();
-            // Use the first 25 characters of the first user message as the title
             const title = role === 'user' ? content.substring(0, 25) + '...' : 'New Chat';
-            
-            savedChats.unshift({
-                id: currentChatId,
-                title: title,
-                messages: []
-            });
+            savedChats.unshift({ id: currentChatId, title: title, messages: [] });
         }
 
-        // Find the active chat and push the new message
         const activeChat = savedChats.find(c => c.id === currentChatId);
         if (activeChat) {
             activeChat.messages.push({ role: role, content: content });
@@ -203,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderHistoryList() {
         chatHistoryList.innerHTML = '';
-        
         savedChats.forEach(chat => {
             const li = document.createElement('li');
             li.className = 'history-item';
@@ -211,12 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             li.innerHTML = `<i class="fa-regular fa-message"></i> ${chat.title}`;
             li.onclick = () => loadSpecificChat(chat.id);
-            
             chatHistoryList.appendChild(li);
         });
     }
-
-    // --- Helpers ---
 
     function showTypingIndicator() {
         const msgDiv = document.createElement('div');
@@ -232,74 +259,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchGeminiAPI(prompt) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
-
         const data = await response.json();
         if (!response.ok) throw new Error(data.error?.message || `Status ${response.status}`);
         return data.candidates[0].content.parts[0].text;
     }
 });
-
-    // --- Voice Input (Web Speech API) ---
-    // Check if the browser supports Speech Recognition
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false; // Stops automatically when you pause speaking
-        recognition.interimResults = true; // Shows words as you speak them
-        
-        let isRecording = false;
-
-        recognition.onstart = () => {
-            isRecording = true;
-            micBtn.classList.add('recording');
-            userInput.placeholder = "Listening...";
-        };
-
-        recognition.onresult = (event) => {
-            let currentTranscript = '';
-            // Piece together the words
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                currentTranscript += event.results[i][0].transcript;
-            }
-            userInput.value = currentTranscript;
-            
-            // Auto-resize the text box as words fill in
-            userInput.style.height = 'auto';
-            userInput.style.height = (userInput.scrollHeight < 150 ? userInput.scrollHeight : 150) + 'px';
-        };
-
-        recognition.onerror = (event) => {
-            console.error("Microphone error:", event.error);
-            stopRecording();
-        };
-
-        recognition.onend = () => {
-            stopRecording();
-        };
-
-        function stopRecording() {
-            isRecording = false;
-            micBtn.classList.remove('recording');
-            userInput.placeholder = "Ask an engineering question...";
-        }
-
-        micBtn.addEventListener('click', () => {
-            if (isRecording) {
-                recognition.stop();
-            } else {
-                userInput.value = ''; // Clear the box before recording
-                recognition.start();
-            }
-        });
-    } else {
-        // If the browser (like old versions or some mobile browsers) doesn't support it, hide the button
-        micBtn.style.display = 'none';
-        console.warn("Speech Recognition API not supported in this browser.");
-    }
