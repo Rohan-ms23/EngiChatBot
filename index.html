@@ -33,7 +33,7 @@
     <main class="chat-container">
         <header class="chat-header">
             <button id="menu-btn" class="mobile-only"><i class="fa-solid fa-bars"></i></button>
-            <div class="header-title">ChatBot In Education</div>
+            <div class="header-title">Engineering Assistant</div>
             <div class="header-status">Ready</div>
         </header>
 
@@ -62,11 +62,13 @@
             </div>
             </div>
 
-        <div class="input-container">
+  <div class="input-container">
             <div class="input-wrapper">
                 <textarea id="user-input" placeholder="Ask an engineering question..." rows="1"></textarea>
-                <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                <button id="mic-btn" title="Voice Input"><i class="fa-solid fa-microphone"></i></button>
+                <button id="send-btn" title="Send Message"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
+            
             <div class="footer-text">EngiMind can make mistakes. Always verify engineering formulas and code.</div>
         </div>
     </main>
@@ -82,14 +84,6 @@
             </div>
         </div>
     </div>
-<div class="input-wrapper">
-    <textarea id="user-input" placeholder="Ask an engineering question..." rows="1"></textarea>
-    
-    <!-- New Mic Button -->
-    <button id="mic-btn" title="Voice Input"><i class="fa-solid fa-microphone"></i></button>
-    
-    <button id="send-btn" title="Send Message"><i class="fa-solid fa-paper-plane"></i></button>
-</div>
 
     <script src="script.js"></script>
 </body>
