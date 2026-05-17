@@ -1,1 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngiMind | Virtual Classroom Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fa-solid fa-graduation-cap"></i> EngiChatBot</h2>
+            <button id="close-sidebar-btn" class="mobile-only"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <button class="new-chat-btn" id="new-chat-btn"><i class="fa-solid fa-plus"></i> New Session</button>
+        
+        <div class="sidebar-section">
+            <h3>Class History</h3>
+            <ul class="chat-history" id="chat-history"></ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <button id="export-pdf-btn"><i class="fa-solid fa-file-pdf"></i> Export Notes</button>
+            <button id="faq-btn"><i class="fa-solid fa-circle-question"></i> Course FAQs</button>
+            <button id="theme-toggle"><i class="fa-solid fa-moon"></i> Theme</button>
+            <button id="settings-btn"><i class="fa-solid fa-gear"></i> API Configuration</button>
+        </div>
+    </aside>
 
+    <main class="chat-container">
+        <header class="chat-header">
+            <button id="menu-btn" class="mobile-only"><i class="fa-solid fa-bars"></i></button>
+            <div class="header-title"></div>
+            <div class="header-status" id="ai-status">Online</div>
+        </header>
+
+        <div class="chat-box" id="chat-box">
+            <div class="welcome-screen" id="welcome-screen">
+                <h1>What are we learning today?</h1>
+                <p>Your AI assistant for software development, technical quizzes, and complex problem-solving.</p>
+               <div class="sample-prompts">
+                    <button class="prompt-btn" data-prompt="Quiz me on Core Python and Data Structures.">
+                        <i class="fa-brands fa-python"></i>
+                        <span>Core Python Quiz</span>
+                    </button>
+                    <button class="prompt-btn" data-prompt="Explain the MTV architecture in Django.">
+                        <i class="fa-solid fa-server"></i>
+                        <span>Django MTV</span>
+                    </button>
+                    <button class="prompt-btn" data-prompt="What is the difference between Flask and FastAPI?">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Flask vs FastAPI</span>
+                    </button>
+                    <button class="prompt-btn" data-prompt="Solve this using Python logic: [x**2 for x in range(5)]">
+                        <i class="fa-solid fa-code"></i>
+                        <span>List Comprehensions</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-wrapper">
+                <textarea id="user-input" placeholder="Ask a question or request a quiz..." rows="1"></textarea>
+                <button id="mic-btn" title="Voice Input"><i class="fa-solid fa-microphone"></i></button>
+                <button id="send-btn" title="Send Message"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+            <div class="footer-text">EngiChatBot is an AI. Always verify complex code logic and engineering formulas.</div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <h3><i class="fa-solid fa-key"></i> System Configuration</h3>
+            <p>Enter your Google Gemini API key to activate the assistant. Stored locally.</p>
+            <input type="password" id="api-key-input" placeholder="AIzaSy...">
+            <div class="modal-actions">
+                <button id="save-key-btn" class="primary-btn">Save Configuration</button>
+                <button id="close-modal-btn" class="secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="faq-modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3><i class="fa-solid fa-circle-question"></i> Frequently Asked Questions</h3>
+            <p>Quick answers to common course queries.</p>
+            <div class="faq-list" id="faq-list-container">
+                </div>
+            <div class="modal-actions" style="margin-top: 1.5rem;">
+                <button id="close-faq-btn" class="secondary-btn" style="width: 100%;">Close FAQs</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
