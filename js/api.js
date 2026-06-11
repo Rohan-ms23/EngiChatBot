@@ -1,7 +1,7 @@
 export class GeminiAPI {
     constructor() {
         // Your live API key is now fully integrated into the architecture
-        this.apiKey = "AQ.Ab8RN6LwX38cT1hIo7XwSt7Fn3eZaGs5S2PI_QoJuYdrI24VmA";
+        this.apiKey = "AQ.Ab8RN
         this.baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
     }
 
