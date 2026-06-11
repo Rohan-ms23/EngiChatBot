@@ -1,7 +1,7 @@
 export class GeminiAPI {
     constructor() {
         // Your live API key is now fully integrated into the architecture
-        this.apiKey = "AQ.Ab8RN
+        this.apiKey = "AQ.Ab8RN6LwX38cT1hIo7XwSt7Fn3eZaGs5S2PI_QoJuYdrI24VmA";
         this.baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
     }
 
@@ -92,3 +92,4 @@ export class GeminiAPI {
         return `I understand you are asking about **"${prompt}"**.\n\nAs this is a live classroom demonstration of the EngiMind UI, I am currently showcasing our core localized response patterns. Try clicking the **Core Python Quiz** button or the **Django MTV** button on the home screen to test full visual rendering!`;
     }
 }
+
