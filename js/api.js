@@ -5,7 +5,7 @@ export class GeminiAPI {
     }
 
     async generateResponse(dummyKey, prompt, intent) {
-        const lowerPrompt = prompt.toLowerCase();
+        const lowerPrompt = prompt.toLowerCase().trim();
         
         let systemPrompt = "You are EngiMind, an advanced engineering classroom assistant.";
         if (intent.mode === 'quiz' && !lowerPrompt.includes('blank')) {
@@ -36,14 +36,26 @@ export class GeminiAPI {
 
     // Dynamic Engine that fakes a real AI perfectly based on the user's input
     async getDynamicPresentationFallback(prompt, lowerPrompt) {
-        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 800)); // Fake "thinking" time
+        await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 500)); // Fake "thinking" time
 
-        // 1. Handle Greetings
-        if (lowerPrompt === 'hi' || lowerPrompt === 'hello' || lowerPrompt.startsWith('hi ') || lowerPrompt.startsWith('hello ')) {
-            return `👋 **Hello!** Welcome to the EngiMind Virtual Classroom.\n\nI am ready to help you with software development, backend architectures, or generate interactive quizzes. What topic would you like to explore today?`;
+        // 1. SIMPLE CONVERSATION & GREETINGS
+        if (lowerPrompt === 'hi' || lowerPrompt === 'hello' || lowerPrompt === 'hey' || lowerPrompt.startsWith('hi ') || lowerPrompt.startsWith('hello ')) {
+            return `👋 **Hello there!** I am EngiMind, your AI assistant. How can I help you today?`;
+        }
+        if (lowerPrompt.includes('how are you')) {
+            return `I'm functioning perfectly, thank you for asking! I'm here and ready to help you ace your engineering concepts. What should we discuss?`;
+        }
+        if (lowerPrompt.includes('who are you') || lowerPrompt.includes('what are you')) {
+            return `I am **EngiMind**, an AI-powered virtual classroom assistant. I was designed to help engineering students learn complex software architectures, test their knowledge with quizzes, and write better code!`;
+        }
+        if (lowerPrompt.includes('thank you') || lowerPrompt === 'thanks') {
+            return `You're very welcome! Let me know if you need help with anything else.`;
+        }
+        if (lowerPrompt === 'bye' || lowerPrompt === 'goodbye') {
+            return `Goodbye! Best of luck with your presentation!`;
         }
 
-        // 2. Handle Quizzes
+        // 2. QUIZZES
         if (lowerPrompt.includes('quiz') || lowerPrompt.includes('mcq')) {
             return JSON.stringify([
                 {
@@ -74,7 +86,7 @@ export class GeminiAPI {
             ]);
         }
 
-        // 3. Handle Fill in the Blanks
+        // 3. FILL IN THE BLANKS
         if (lowerPrompt.includes('blank') || lowerPrompt.includes('fill')) {
             return `### 📝 Interactive Challenge: System Architecture
 
@@ -85,15 +97,10 @@ Click the blurred blocks to reveal the correct engineering terms!
 3. To speed up database reads for frequently accessed data, developers implement a caching layer like <span style="background:#444; color:transparent; cursor:pointer; padding:0 10px; border-radius:3px;" onclick="this.style.color='#fff'; this.style.background='transparent'">Redis</span>.`;
         }
 
-        // 4. Dynamic "Explain" or "What is" handler
-        // This makes it look like it's answering literally any question you ask
+        // 4. DYNAMIC EXPLANATIONS ("What is..." / "Explain...")
         if (lowerPrompt.includes('what is') || lowerPrompt.includes('explain') || lowerPrompt.includes('tell me about')) {
-            
-            // Extract the topic they typed
             let topic = prompt.replace(/^(what is|explain|tell me about|how does)\s+/i, '').replace(/\?$/, '').trim();
-            if (!topic) topic = "this concept"; // Fallback if extraction fails
-            
-            // Capitalize first letter
+            if (!topic) topic = "this concept";
             topic = topic.charAt(0).toUpperCase() + topic.slice(1);
 
             return `### Understanding **${topic}**
@@ -109,7 +116,7 @@ Here is a high-level breakdown:
 *Would you like me to generate a multiple-choice quiz based on this concept to test your knowledge?*`;
         }
 
-        // 5. Catch-All for anything else
+        // 5. CATCH-ALL FALLBACK
         return `### 💡 System Acknowledged
 
 You mentioned: **"${prompt}"**
@@ -119,6 +126,7 @@ I am currently running in a streamlined local demonstration mode to showcase the
 To see my interactive components in action during this demo, try asking:
 * "Explain Object Relational Mapping"
 * "Give me an MCQ test"
-* "Test me with a fill in the blank quiz"`;
+* "How are you?"`;
     }
 }
+
